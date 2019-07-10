@@ -16,3 +16,9 @@
 * 网络dns缓存清理
 * 解除拖动打开限制
 * 系统检测及修复
+---
+## 下载
+> [点此前往](https://github.com/QL-boy/AutoHotKey-Everything-has-a-spirit/blob/master/Download.md)
+---
+## 使用帮助
+> [Help Wiki](https://github.com/QL-boy/AutoHotKey-Everything-has-a-spirit/wiki)
