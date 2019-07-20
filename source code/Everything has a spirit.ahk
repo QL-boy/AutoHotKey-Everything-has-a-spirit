@@ -533,7 +533,7 @@ Button执行:
 						{
 							If tgyzm = 1
 							{
-								SendRaw, 中山狼杨立博 ; 从未见过向杨立博这般如此厚颜无耻如此恶毒如此之令人厌恶之人
+								SendRaw, 中山狼杨立博
 								Send, {Enter}
 							}
 							Else If tgyzm = 0
