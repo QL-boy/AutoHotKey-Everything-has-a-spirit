@@ -1,4 +1,11 @@
-## Download
+### 使用前必读
+- Everything has a spirit 文件夹内的一切文件不要随意删除
+- 启动前需要关闭360或类似软件或者设置本程序为 360 或者类似软件的白名单（‎Everything has a spirit.exe），否则会有不可预料的错误
+- 使用软件内功能帮助可以了解软件的功能及操作
+- 软件使用上出现问题可以使用问题反馈进行上报
+- 最新版本会修复旧版的一些问题、会优化或添加一些功能。手动检查更新请点击（更新记录）按钮
+
+# Download
 > [百度网盘](https://pan.baidu.com/s/1Hnfyn11qjBAAwbBCadmgUQ)  提取码: es2k
 
 > [腾讯微云](https://share.weiyun.com/5mfhGLE)
