@@ -22,3 +22,4 @@
 ---
 ## 使用帮助
 > [Help Wiki](https://github.com/QL-boy/AutoHotKey-Everything-has-a-spirit/wiki)
+正在完善中
