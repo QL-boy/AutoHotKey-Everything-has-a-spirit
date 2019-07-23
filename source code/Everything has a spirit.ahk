@@ -3,7 +3,7 @@
 
 [AHK2EXE]
 Exe_File=%In_Dir%\Everything has a spirit.exe
-Compression=2
+Compression=0
 No_UPX=1
 Created_Date=1
 Execution_Level=4
@@ -11,7 +11,7 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.4.1.1
+File_Version=1.5.0.1
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
@@ -40,6 +40,7 @@ Icon_5=0
 	(%coordinatesX%) 当前窗口X坐标
 	(%coordinatesY%) 当前窗口Y坐标
 	(%function%) 功能集合
+	(%Greetings%) 加好友问候语
 	(%paragraph%) 发广告发送内容
 	(%Jway%) 加好友选择模式
 	(%Fway%) 发广告选择模式
@@ -60,11 +61,13 @@ Icon_5=0
 	(%优化修复%) 优化修复帮助说明
 	(%辅助增强%) 辅助增强帮助说明
 	(%TopAndBottom%) 窗口置顶或取消运行状态
+	(%滚页%) 失效好友添加页面滚动参数
 
 标签声明：
 	(GuiDropFiles:) 拖动文件执行排版
 	(Button点击开始排版:) 点击开始排版
 	(Button执行:) 执行加号友或发广告
+	(加好友模式:) 加好友模式界面调整
 	(Button冗沉垃圾清理:) 冗沉垃圾清理
 	(Button网络dns缓存清理:) 网络dns缓存清理
 	(Button解除拖动打开限制:) 解除拖动打开限制
@@ -82,7 +85,7 @@ Icon_5=0
 	(Button更新记录:) 更新记录
 	(F1:) 营销QQ发广告主窗口窗口检测重试
 	(F2:) 普通QQ和企业QQ发广告主窗口窗口检测重试
-	(F3:) 营销QQ加好友主窗口窗口检测重试
+	(F5:) 营销QQ加好友主窗口窗口检测重试
 	(F4:) 普通QQ和企业QQ加好友主窗口窗口检测重试
 	(实验性:) 验证码自动忽略提示
 	(empty连续数据:) empty嵌入部分
@@ -96,20 +99,23 @@ Process, Priority, , High  ; 脚本运行优先级为高
 SetBatchLines -1 ; 脚本全速运行
 ListLines Off ; 在历史中略去后续执行的行
 SetWorkingDir %A_ScriptDir% ; 脚本当前工作目录
+
+URL := "http://xui.ptlogin2.qq.com/cgi-bin/xlogin?appid=501038301&proxy_url=http%3A%2F%2Fid.qq.com%2Flogin%2Fproxy.html&s_url=http%3A%2F%2Fim.qq.com%2F"
+If InternetCheckConnection(URL)
 { ; 跳过预设 QQ 
-	QQHM = % GetLoggedinQQ()
+	QQHM := % GetLoggedinQQ()
 	If (InStr(QQHM, "1576049590")) > 0
 	{
 		ExitApp
 	}
 }
 
-Gosub, helptext
+Gosub, helptext ; 读取说明帮助
 
 Menu Tray, NoStandard ; 取除托盘默认菜单
 Menu, Tray, Tip, ‎Everything has a spirit
-Hotkey, #BackSpace, , OFF
-Hotkey, #End, , OFF
+Hotkey, #BackSpace, , OFF ; 禁用#BackSpace热键
+Hotkey, #End, , OFF ; 禁用#End热键
 
 Gui Font, s9, ; 定义后方字号与字体
 Gui Add, Button, x335 y5 w90 h21, 查看在线帮助
@@ -135,10 +141,16 @@ Gui Tab, 1
 	Gui Font, s9, ; 定义后方字号
 	Gui Add, Button, x150 y35 w55 h75, 导入`nQQ号码`n列表
 	Gui Add, Button, x150 y115 w55 h75, 清空`nQQ号码`n列表
-	Gui Font, s9, ; 定义后方字号
 	Gui Add, ListBox, x210 y35 w210 h155, 请先点击导入QQ号码列表按钮
-	Gui Add, Radio, 0x1000 VJway x150 y195 w150 h25, 营销QQ模式
-	Gui Add, Radio, 0x1000 x150 y230 w150 h25, 企业和普通QQ模式
+
+	Gui Add, Edit, VGreetings x150 y35 w270 h155, 请在这里输入问候语
+
+	Gui Font, s12, ; 定义后方字号
+	Gui Add, Text, Cff0000 x175 y110 +0x200, 需要先选择需要执行的模式！
+
+	Gui Font, s9, ; 定义后方字号
+	Gui Add, Radio, 0x1000 VJway G加好友模式 x150 y195 w150 h25, 营销QQ失效好友添加
+	Gui Add, Radio, 0x1000 G加好友模式 x150 y230 w150 h25, 企业和普通QQ模式
 	Gui Font, s10, ; 定义后方字号
 	Gui Add, CheckBox, VJshutdown x305 y195 w70 h25, 关 机
 	Gui Add, Edit, 0x2000 Limit VJfrequency x305 y230 w40 h25, 20
@@ -174,7 +186,16 @@ Gui Tab, 4
 	Gui Add, Button, x290 y30 w130 h40, 恢复快捷方式小箭头
 	Gui Add, Button, x10 y75 w130 h40, 系统详细信息
 	Gui Add, Button, x150 y75 w130 h40, 敬请期待
-
+{ ; 禁用隐藏初始控件
+	GuiControl, Disable, Button10
+	GuiControl, Disable, Button11
+	GuiControl, Disable, ListBox1
+	GuiControl, Disable, Edit2
+	GuiControl, Hide, Button10
+	GuiControl, Hide, Button11
+	GuiControl, Hide, ListBox1
+	GuiControl, Hide, Edit2
+}
 tt := 0
 Loop, 10 ; 程序开启延展
 {
@@ -185,8 +206,8 @@ Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
-CV = 1.4.1 ; 当前版本
-Gosub, New
+CV = 1.5.0 ; 当前版本
+Gosub, New ; 启动更新检查
 Return
 
 F7::Pause ; 全局暂停
@@ -311,14 +332,156 @@ Button执行:
 	Gui, Submit, NoHide ; 控件内容写入变量不隐藏窗口
 	If function = 加好友
 	{
-		If paragraph = 请在这里输入问候语,未输入则不发送任何内容
-		{
-			paragraph := ""
-		}
-
 		If Jway = 1
 		{
-			MsgBox, 262144, , 营销QQ模式（占个位，已经有一个相关软件可以使用，貌似不需要再造一个轮子了）
+			If Greetings = 请在这里输入问候语
+			{
+				Greetings =
+			}
+
+			F5:
+			IfWinNotExist, 营销QQ 黄金套餐 ahk_class TXGuiFoundation ahk_exe QQCRM.exe
+			{
+				MsgBox, 262165, 缺少必要条件, 没有检测到营销QQ窗口，请确保营销QQ窗口处于打开状态, 5
+				IfMsgBox, Retry
+				{
+					Goto, F5
+				}
+				Return
+			}
+
+			#Persistent
+			ToolTip, 注意：F7 是全局暂停/继续 ，F3 是全局强制重启主程序
+			SetTimer, RemoveToolTip, 3500
+
+			WinHide, ‎Everything has a spirit ahk_class AutoHotkeyGUI
+			WinMinimizeAll ; 最小化所有窗口
+			Sleep, 150
+			WinMaximize, 营销QQ 黄金套餐 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 最大化营销QQ 黄金套餐窗口
+			MsgBox, 4161, 提示, 请在客户管理中打开靠后的失效客户列表并选中最底部的客户，点击确定继续
+			IfMsgBox, Cancel
+			{
+				WinShow, ‎Everything has a spirit ahk_class AutoHotkeyGUI
+				Return
+			}
+			BlockInput, SendAndMouse ; 开启规避用户鼠标和键盘输入
+			加为好友:="|<>48.809U80208SBU9z70zP5Uy6Tz9HTySA609H12G87y9H12Hz769H3GK8D49H2+A89gNH62C8MsFTA2O8FsrHMyksr7U"
+			已失效:="|<>35.00108Fzsm0NU0lznzy1a82gjz8E9tTyTzlGk0zwoRU470sn08P0la0nX2rbzQ3sNk"
+			左翻页:="|<>50.00000036AA00601zz7003U0ognU01k07zhk00s006/Q00C00TynU01k068AQ00C01zv3001U03W0000003fU000003Wu"
+			取消:="|<>23.T0GGryqhB85HuKTooaUjf1zTQ3yaMo7yljyPmEEwwXUU16U"
+			滚页 = 0
+			Loop, %Jfrequency%
+			{
+				loop ; 直到成功点击已失效
+				{
+					WinActivate, 营销QQ 黄金套餐 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 激活营销QQ主窗口
+					If 识别结果(675,712,150000,150000,已失效,"*120",X,Y,OCR,0,0)
+					{
+						CoordMode, Mouse ; 相对屏幕执行鼠标动作
+						Click, right, %X%, %Y%
+						break
+					}
+					Else
+					{
+						MsgBox, 4149, 丢失目标, 当前页面未发现已失效客户或未选中其中一个失效客户，请切换列表或选中其中一个失效客户后重试, 60
+						IfMsgBox, Timeout
+						{
+							break, 2
+						}
+						Else IfMsgBox, Cancel
+						{
+							WinShow, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 显示程序主窗口
+							Return
+						}
+					}
+				}
+				tt = 0 ; 此处用作容错判断
+				Loop ; 直到成功点击加为好友
+				{
+					Sleep, 50
+					If 识别结果(961,761,150000,150000,加为好友,"*140",X,Y,OCR,0,0) ; 获取加为好菜单项坐标
+					{
+						CoordMode, Mouse ; 相对屏幕执行鼠标动作
+						Click, %X%, %Y%
+						break
+					}
+					tt := % tt+1
+					If tt = 3 ; 超过 3 次未找到加为好友即重启大循环
+					{
+						Continue, 2
+					}
+					Click, right
+				}
+				Loop ; 直到添加客户窗口消失
+				{
+					WinWait, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 等待添加客户窗口
+					WinGetPos, , , , sizeH, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 获取当前添加客户窗口的高度
+					If sizeH = 294 ; 添加步骤
+					{
+						If Greetings != 
+						{
+							Clipboard := Greetings
+							ControlClick, x155 y163, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe
+							Send, ^a
+							Send, ^v
+						}
+						ControlClick, x220 y277, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe
+					}
+					Else If sizeH = 150 ; 完成确认
+					{
+						WinActivate, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 激活添加客户弹窗
+						CoordMode, Mouse, Window ; 相对当前活动窗口执行鼠标动作
+						Click, 296, 133, 1 ; 确定
+						WinWaitClose, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 等待添加客户弹窗消失
+						Break
+					}
+					Else If sizeH = 246 ; 跳过需要验证客户
+					{
+						WinActivate, 添加客户 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 激活添加客户弹窗
+						If 识别结果(691,546,150000,150000,取消,"*150",X,Y,OCR,0,0)
+						{
+							CoordMode, Mouse ; 相对屏幕执行鼠标动作
+							Click, %X%, %Y% ; 取消
+							Break
+						}
+					}
+					Sleep, 50
+				}
+				WinActivate, 营销QQ 黄金套餐 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 激活营销QQ主窗口
+				If 滚页 = 4
+				{
+					Click, WheelUp, 1 ; 向上滚动一次
+					滚页 = 0
+					Sleep, 500
+				}
+				If 识别结果(675,712,150000,150000,已失效,"*120",X,Y,OCR,0,0)
+				{
+					WinGetPos, , coordinatesY, , , 营销QQ 黄金套餐 ahk_class TXGuiFoundation ahk_exe QQCRM.exe ; 获取当前窗口的 Y 坐标
+					Y := % Y-25 ; 偏移到新坐标
+					coordinatesY := % Y-coordinatesY ; 计算新坐标差值
+					If coordinatesY < 145 ; 到达顶部自动调整页面
+					{
+						If 识别结果(1044,730,150000,150000,左翻页,"*136",X,Y,OCR,0,0)
+						{
+							CoordMode, Mouse ; 相对屏幕执行鼠标动作
+							Click, %X%, %Y% ; 点击左翻页按钮
+							Y := % Y-43 ; 坐标偏移
+							CoordMode, Mouse ; 相对屏幕执行鼠标动作
+							MouseMove, X, Y ; 鼠标移动到偏移后坐标
+							Click, WheelDown, 5 ; 向下滚动5次
+							滚页 = 0
+							Sleep, 500
+							CoordMode, Mouse ; 相对屏幕执行鼠标动作
+							Click, %X%, %Y% ; 点击偏移后坐标
+							Continue
+						}
+					}
+					CoordMode, Mouse ; 相对屏幕执行鼠标动作
+					Click, %X%, %Y%
+				}
+				滚页 := % 滚页+1
+			}
+			BlockInput, Default ; 停用规避用户鼠标和键盘输入
 		}
 		Else If Jway = 2
 		{	
@@ -565,7 +728,7 @@ Button执行:
 						Break ; 结束循环
 					}
 				}
-				tt = % tt+1
+				tt := % tt+1
 				If tt = 1
 				{
 					RunWait, ETHAS\empty.exe *.exe, , Hide
@@ -660,6 +823,33 @@ Button执行:
 			Return
 		}
 	}
+加好友模式:
+	Gui, Submit, NoHide ; 控件内容写入变量不隐藏窗口
+	GuiControl, Disable, Static2
+	GuiControl, Hide, Static2
+	If Jway = 1
+	{
+		GuiControl, Disable, Button10
+		GuiControl, Disable, Button11
+		GuiControl, Disable, ListBox1
+		GuiControl, Enable, Edit2
+		GuiControl, Hide, Button10
+		GuiControl, Hide, Button11
+		GuiControl, Hide, ListBox1
+		GuiControl, Show, Edit2
+	}
+	Else If Jway = 2
+	{
+		GuiControl, Enable, Button10
+		GuiControl, Enable, Button11
+		GuiControl, Enable, ListBox1
+		GuiControl, Disable, Edit2
+		GuiControl, Show, Button10
+		GuiControl, Show, Button11
+		GuiControl, Show, ListBox1
+		GuiControl, Hide, Edit2
+	}
+	Return
 Button冗沉垃圾清理:
 	FileDelete, C:\tmp\tt.cmd
 	FileAppend,
@@ -866,7 +1056,7 @@ Button功能帮助:
 				tt := 450
 				Loop, 30
 				{
-					tt := % tt - 5
+					tt := % tt-5
 					Gui Show, w430 h%tt%, ‎Everything has a spirit ; 程序抽屉关闭
 				}
 				Gui Show, w430 h300, ‎Everything has a spirit
@@ -914,7 +1104,7 @@ Button功能帮助:
 	tt := 300
 	Loop, 30
 	{
-		tt := % tt + 5
+		tt := % tt+5
 		Gui Show, w430 h%tt%, ‎Everything has a spirit ; 程序抽屉打开
 	}
 	Gui Show, w430 h450, ‎Everything has a spirit
@@ -934,7 +1124,7 @@ Button关于软件:
 				tt := 450
 				Loop, 30
 				{
-					tt := % tt - 5
+					tt := % tt-5
 					Gui Show, w430 h%tt%, ‎Everything has a spirit ; 程序抽屉关闭
 				}
 				Gui Show, w430 h300, ‎Everything has a spirit
@@ -949,7 +1139,7 @@ Button关于软件:
 	tt := 300
 	Loop, 30
 	{
-		tt := % tt + 5
+		tt := % tt+5
 		Gui Show, w430 h%tt%, ‎Everything has a spirit ; 程序抽屉打开
 	}
 	Gui Show, w430 h450, ‎Everything has a spirit
@@ -1025,7 +1215,7 @@ GuiEscape:
 		tt := 450
 		Loop, 30
 		{
-			tt := % tt - 5
+			tt := % tt-5
 			Gui Show, w430 h%tt%, ‎Everything has a spirit ; 程序抽屉关闭
 		}
 		Return
@@ -1044,16 +1234,16 @@ GuiClose:
 	WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 ‎Everything has a spirit 窗口的大小
 	If (sizeH + sizeW > dimensionH + dimensionW)
 	{
-		sizeH := % sizeH - (sizeH - 450)
+		sizeH := % sizeH-(sizeH-450)
 	}
 	Else
 	{
-		sizeH := % sizeH - (sizeH - 300)
+		sizeH := % sizeH-(sizeH-300)
 	}
 	tt := 430
 	Loop, 43
 	{
-		tt := % tt - 10
+		tt := % tt-10
 		Gui Show, w%tt% h%sizeH%, ‎Everything has a spirit ; 程序关闭
 	}
 	ExitApp
@@ -1112,6 +1302,356 @@ empty连续数据:
     00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100100000001800008000000000000000000000000000000100010000003000008000000000000000000000000000000100090400004800000060402D00A403000000000000000000000000000000000000A40334000000560053005F00560045005200530049004F004E005F0049004E0046004F0000000000BD04EFFE00000100020005000000CE0E020005000000CE0E3F00000008000000040004000100000000000000000000000000000002030000010053007400720069006E006700460069006C00650049006E0066006F000000DE02000001003000340030003900300034004200300000004C001600010043006F006D00700061006E0079004E0061006D006500000000004D006900630072006F0073006F0066007400200043006F00720070006F0072006100740069006F006E000000720025000100460069006C0065004400650073006300720069007000740069006F006E00000000004D006900630072006F0073006F0066007400AE00200046006C00750073006800200057006F0072006B0069006E006700200053006500740020005500740069006C0069007400790000000000700028000100460069006C006500560065007200730069006F006E000000000035002E0032002E0033003700390030002E00300020006200750069006C0074002000620079003A00200064006E007300720076005F00640065007600280076002D0073006D00670075006D002900000034000A00010049006E007400650072006E0061006C004E0061006D006500000065006D007000740079002E00650078006500000080002E0001004C006500670061006C0043006F0070007900720069006700680074000000A90020004D006900630072006F0073006F0066007400200043006F00720070006F0072006100740069006F006E002E00200041006C006C0020007200690067006800740073002000720065007300650072007600650064002E0000003C000A0001004F0072006900670069006E0061006C00460069006C0065006E0061006D006500000065006D007000740079002E0065007800650000006A0025000100500072006F0064007500630074004E0061006D006500000000004D006900630072006F0073006F0066007400AE002000570069006E0064006F0077007300AE0020004F007000650072006100740069006E0067002000530079007300740065006D00000000003A000B000100500072006F006400750063007400560065007200730069006F006E00000035002E0032002E0033003700390030002E00300000000000440000000100560061007200460069006C00650049006E0066006F00000000002400040000005400720061006E0073006C006100740069006F006E00000000000904B00400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
     )
 Return
+
+; 下方为屏幕找图识别算法
+识别结果(x,y,w,h,wz,c,ByRef rx="",ByRef ry="",ByRef ocr=""
+	, cha1=0, cha0=0)
+{
+	xywh2xywh(x-w,y-h,2*w+1,2*h+1,x,y,w,h)
+	if (w<1 or h<1)
+		return, 0
+	bch:=A_BatchLines
+	SetBatchLines, -1
+	GetBitsFromScreen(x,y,w,h,Scan0,Stride,bits)
+	sx:=0, sy:=0, sw:=w, sh:=h
+	loop, 2 {
+		if PicOCR(Scan0,Stride,sx,sy,sw,sh,wz,c
+			,rx,ry,ocr,cha1,cha0)
+		{
+			rx+=x, ry+=y
+			SetBatchLines, %bch%
+			return, 1
+		}
+		if (A_Index=1 and cha1=0 and cha0=0)
+			cha1:=0.05, cha0:=0.05
+		else break
+	}
+	SetBatchLines, %bch%
+	return, 0
+}
+xywh2xywh(x1,y1,w1,h1,ByRef x,ByRef y,ByRef w,ByRef h)
+{
+	SysGet, zx, 76
+	SysGet, zy, 77
+	SysGet, zw, 78
+	SysGet, zh, 79
+	left:=x1, Right:=x1+w1-1, up:=y1, down:=y1+h1-1
+	left:=left<zx ? zx:left, Right:=Right>zx+zw-1 ? zx+zw-1:Right
+	up:=up<zy ? zy:up, down:=down>zy+zh-1 ? zy+zh-1:down
+	x:=left, y:=up, w:=Right-left+1, h:=down-up+1
+}
+GetBitsFromScreen(x,y,w,h,ByRef Scan0,ByRef Stride,ByRef bits)
+{
+	VarSetCapacity(bits,w*h*4,0), bpp:=32
+	Scan0:=&bits, Stride:=((w*bpp+31)//32)*4
+	Ptr:=A_PtrSize ? "UPtr" : "UInt", PtrP:=Ptr . "*"
+	win:=DllCall("GetDesktopWindow", Ptr)
+	hDC:=DllCall("GetWindowDC", Ptr,win, Ptr)
+	mDC:=DllCall("CreateCompatibleDC", Ptr,hDC, Ptr)
+	VarSetCapacity(bi, 40, 0), NumPut(40, bi, 0, "int")
+	NumPut(w, bi, 4, "int"), NumPut(-h, bi, 8, "int")
+	NumPut(1, bi, 12, "short"), NumPut(bpp, bi, 14, "short")
+	if hBM:=DllCall("CreateDIBSection", Ptr,mDC, Ptr,&bi
+		, "int",0, PtrP,ppvBits, Ptr,0, "int",0, Ptr)
+	{
+		oBM:=DllCall("SelectObject", Ptr,mDC, Ptr,hBM, Ptr)
+		DllCall("BitBlt", Ptr,mDC, "int",0, "int",0, "int",w, "int",h
+			, Ptr,hDC, "int",x, "int",y, "uint",0x00CC0020|0x40000000)
+		DllCall("RtlMoveMemory","ptr",Scan0,"ptr",ppvBits,"ptr",Stride*h)
+		DllCall("SelectObject", Ptr,mDC, Ptr,oBM)
+	}
+	DllCall("DeleteObject", Ptr,hBM)
+	DllCall("DeleteDC", Ptr,mDC)
+	DllCall("ReleaseDC", Ptr,win, Ptr,hDC)
+}
+PicOCR(Scan0, Stride, sx, sy, sw, sh, wenzi, c
+	, ByRef rx, ByRef ry, ByRef ocr, cha1, cha0)
+{
+	static MyFunc
+	if !MyFunc
+	{
+		x32:="5589E55383C4808B452C0FAF45248B5528C1E20201D0894"
+		. "5F08B5530B80000000029D0C1E00289C28B452401D08945ECC"
+		. "745E800000000C745D800000000C745D4000000008B4530894"
+		. "5D08B45348945CCC745C800000000837D08000F854D0100008"
+		. "B450CC1E81025FF0000008945C48B450CC1E80825FF0000008"
+		. "945C08B450C25FF0000008945BC8B4510C1E81025FF0000008"
+		. "945B88B4510C1E80825FF0000008945B48B451025FF0000008"
+		. "945B08B45C42B45B88945AC8B45C02B45B48945A88B45BC2B4"
+		. "5B08945A48B55C48B45B801D08945A08B55C08B45B401D0894"
+		. "59C8B55BC8B45B001D0894598C745F400000000E9A6000000C"
+		. "745F800000000E9840000008B45F083C00289C28B452001D00"
+		. "FB6000FB6C08945C48B45F083C00189C28B452001D00FB6000"
+		. "FB6C08945C08B55F08B452001D00FB6000FB6C08945BC8B45C"
+		. "43B45AC7C338B45C43B45A07F2B8B45C03B45A87C238B45C03"
+		. "B459C7F1B8B45BC3B45A47C138B45BC3B45987F0B8B55E88B4"
+		. "53C01D0C600318345F8018345F0048345E8018B45F83B45300"
+		. "F8C70FFFFFF8345F4018B45EC0145F08B45F43B45340F8C4EF"
+		. "FFFFFE917020000837D08010F85A30000008B450C83C001C1E"
+		. "00789450CC745F400000000EB7DC745F800000000EB628B45F"
+		. "083C00289C28B452001D00FB6000FB6C06BD0268B45F083C00"
+		. "189C18B452001C80FB6000FB6C06BC04B8D0C028B55F08B452"
+		. "001D00FB6000FB6D089D0C1E00429D001C83B450C730B8B55E"
+		. "88B453C01D0C600318345F8018345F0048345E8018B45F83B4"
+		. "5307C968345F4018B45EC0145F08B45F43B45340F8C77FFFFF"
+		. "FE96A010000C745F400000000EB7BC745F800000000EB608B5"
+		. "5E88B45388D0C028B45F083C00289C28B452001D00FB6000FB"
+		. "6C06BD0268B45F083C00189C38B452001D80FB6000FB6C06BC"
+		. "04B8D1C028B55F08B452001D00FB6000FB6D089D0C1E00429D"
+		. "001D8C1F80788018345F8018345F0048345E8018B45F83B453"
+		. "07C988345F4018B45EC0145F08B45F43B45340F8C79FFFFFF8"
+		. "B453083E8018945948B453483E801894590C745F401000000E"
+		. "9B0000000C745F801000000E9940000008B45F40FAF453089C"
+		. "28B45F801D08945E88B55E88B453801D00FB6000FB6D08B450"
+		. "C01D08945EC8B45E88D50FF8B453801D00FB6000FB6C03B45E"
+		. "C7F488B45E88D50018B453801D00FB6000FB6C03B45EC7F328"
+		. "B45E82B453089C28B453801D00FB6000FB6C03B45EC7F1A8B5"
+		. "5E88B453001D089C28B453801D00FB6000FB6C03B45EC7E0B8"
+		. "B55E88B453C01D0C600318345F8018B45F83B45940F8C60FFF"
+		. "FFF8345F4018B45F43B45900F8C44FFFFFF8B45D40FAF45308"
+		. "9C28B45D801D089458CC745F800000000E912030000C745F40"
+		. "0000000E9F60200008B45F40FAF453089C28B45F801C28B458"
+		. "C01D08945F0C745E800000000E9C40200008B45E883C0018D1"
+		. "485000000008B454801D08B008945948B45E883C0028D14850"
+		. "00000008B454801D08B008945908B55F88B459401D03B45D00"
+		. "F8F800200008B55F48B459001D03B45CC0F8F6F0200008B45E"
+		. "88D1485000000008B454801D08B008945888B45E883C0038D1"
+		. "485000000008B454801D08B008945848B45E883C0048D14850"
+		. "00000008B454801D08B008945808B45E883C0058D148500000"
+		. "0008B454801D08B008945E48B45E883C0068D1485000000008"
+		. "B454801D08B008945E08B45843945800F4D458089857CFFFFF"
+		. "FC745EC00000000E9820000008B45EC3B45847D378B55888B4"
+		. "5EC01D08D1485000000008B454001D08B108B45F001D089C28"
+		. "B453C01D00FB6003C31740E836DE401837DE4000F889E01000"
+		. "08B45EC3B45807D378B55888B45EC01D08D1485000000008B4"
+		. "54401D08B108B45F001D089C28B453C01D00FB6003C30740E8"
+		. "36DE001837DE0000F88620100008345EC018B45EC3B857CFFF"
+		. "FFF0F8C6FFFFFFF837DC8000F858A0000008B55288B45F801C"
+		. "28B454C89108B454C83C0048B4D2C8B55F401CA89108B454C8"
+		. "D50088B459489028B454C8D500C8B45908902C745C80400000"
+		. "0837D180175728B45F42B45908945D48B559089D001C001D08"
+		. "945CC8B559089D0C1E00201D001C083C0648945D0837DD4007"
+		. "907C745D4000000008B45342B45D43B45CC7D338B45342B45D"
+		. "48945CCEB288B55DC8B451401D03B45F87F1B8B45C88D50018"
+		. "955C88D1485000000008B454C01D0C700FFFFFFFF8B45C88D5"
+		. "0018955C88D1485000000008B454C01D08B55E883C20789108"
+		. "17DC8FD0300000F8FAA000000C745EC00000000EB298B55888"
+		. "B45EC01D08D1485000000008B454001D08B108B45F001D089C"
+		. "28B453C01D0C600308345EC018B45EC3B45847CCF8B45F883C"
+		. "0010145D88B45948945DC8B45302B45D83B45D00F8D0AFDFFF"
+		. "F8B45302B45D88945D0E9FCFCFFFF90EB0490EB01908345E80"
+		. "78B45E83B451C0F8C30FDFFFF8345F4018B45F43B45CC0F8CF"
+		. "EFCFFFF8345F8018B45F83B45D00F8CE2FCFFFF837DC800750"
+		. "8B800000000EB0690B80100000083EC805B5DC24800"
+		x64:="554889E54883C480894D108955184489452044894D288B4"
+		. "5580FAF45488B5550C1E20201D08945F48B5560B8000000002"
+		. "9D0C1E00289C28B454801D08945F0C745EC00000000C745DC0"
+		. "0000000C745D8000000008B45608945D48B45688945D0C745C"
+		. "C00000000837D10000F855D0100008B4518C1E81025FF00000"
+		. "08945C88B4518C1E80825FF0000008945C48B451825FF00000"
+		. "08945C08B4520C1E81025FF0000008945BC8B4520C1E80825F"
+		. "F0000008945B88B452025FF0000008945B48B45C82B45BC894"
+		. "5B08B45C42B45B88945AC8B45C02B45B48945A88B55C88B45B"
+		. "C01D08945A48B55C48B45B801D08945A08B55C08B45B401D08"
+		. "9459CC745F800000000E9B6000000C745FC00000000E994000"
+		. "0008B45F483C0024863D0488B45404801D00FB6000FB6C0894"
+		. "5C88B45F483C0014863D0488B45404801D00FB6000FB6C0894"
+		. "5C48B45F44863D0488B45404801D00FB6000FB6C08945C08B4"
+		. "5C83B45B07C388B45C83B45A47F308B45C43B45AC7C288B45C"
+		. "43B45A07F208B45C03B45A87C188B45C03B459C7F108B45EC4"
+		. "863D0488B45784801D0C600318345FC018345F4048345EC018"
+		. "B45FC3B45600F8C60FFFFFF8345F8018B45F00145F48B45F83"
+		. "B45680F8C3EFFFFFFE959020000837D10010F85B60000008B4"
+		. "51883C001C1E007894518C745F800000000E98D000000C745F"
+		. "C00000000EB728B45F483C0024863D0488B45404801D00FB60"
+		. "00FB6C06BD0268B45F483C0014863C8488B45404801C80FB60"
+		. "00FB6C06BC04B8D0C028B45F44863D0488B45404801D00FB60"
+		. "00FB6D089D0C1E00429D001C83B451873108B45EC4863D0488"
+		. "B45784801D0C600318345FC018345F4048345EC018B45FC3B4"
+		. "5607C868345F8018B45F00145F48B45F83B45680F8C67FFFFF"
+		. "FE999010000C745F800000000E98D000000C745FC00000000E"
+		. "B728B45EC4863D0488B4570488D0C028B45F483C0024863D04"
+		. "88B45404801D00FB6000FB6C06BD0268B45F483C0014C63C04"
+		. "88B45404C01C00FB6000FB6C06BC04B448D04028B45F44863D"
+		. "0488B45404801D00FB6000FB6D089D0C1E00429D04401C0C1F"
+		. "80788018345FC018345F4048345EC018B45FC3B45607C86834"
+		. "5F8018B45F00145F48B45F83B45680F8C67FFFFFF8B456083E"
+		. "8018945988B456883E801894594C745F801000000E9CA00000"
+		. "0C745FC01000000E9AE0000008B45F80FAF456089C28B45FC0"
+		. "1D08945EC8B45EC4863D0488B45704801D00FB6000FB6D08B4"
+		. "51801D08945F08B45EC4898488D50FF488B45704801D00FB60"
+		. "00FB6C03B45F07F538B45EC4898488D5001488B45704801D00"
+		. "FB6000FB6C03B45F07F388B45EC2B45604863D0488B4570480"
+		. "1D00FB6000FB6C03B45F07F1D8B55EC8B456001D04863D0488"
+		. "B45704801D00FB6000FB6C03B45F07E108B45EC4863D0488B4"
+		. "5784801D0C600318345FC018B45FC3B45980F8C46FFFFFF834"
+		. "5F8018B45F83B45940F8C2AFFFFFF8B45D80FAF456089C28B4"
+		. "5DC01D0894590C745FC00000000E98E030000C745F80000000"
+		. "0E9720300008B45F80FAF456089C28B45FC01C28B459001D08"
+		. "945F4C745EC00000000E9400300008B45EC48984883C001488"
+		. "D148500000000488B85900000004801D08B008945988B45EC4"
+		. "8984883C002488D148500000000488B85900000004801D08B0"
+		. "08945948B55FC8B459801D03B45D40F8FEA0200008B55F88B4"
+		. "59401D03B45D00F8FD90200008B45EC4898488D14850000000"
+		. "0488B85900000004801D08B0089458C8B45EC48984883C0034"
+		. "88D148500000000488B85900000004801D08B008945888B45E"
+		. "C48984883C004488D148500000000488B85900000004801D08"
+		. "B008945848B45EC48984883C005488D148500000000488B859"
+		. "00000004801D08B008945E88B45EC48984883C006488D14850"
+		. "0000000488B85900000004801D08B008945E48B45883945840"
+		. "F4D4584894580C745F000000000E9980000008B45F03B45887"
+		. "D428B558C8B45F001D04898488D148500000000488B8580000"
+		. "0004801D08B108B45F401D04863D0488B45784801D00FB6003"
+		. "C31740E836DE801837DE8000F88D40100008B45F03B45847D4"
+		. "28B558C8B45F001D04898488D148500000000488B858800000"
+		. "04801D08B108B45F401D04863D0488B45784801D00FB6003C3"
+		. "0740E836DE401837DE4000F888D0100008345F0018B45F03B4"
+		. "5800F8C5CFFFFFF837DCC000F859D0000008B55508B45FC01C"
+		. "2488B85980000008910488B85980000004883C0048B4D588B5"
+		. "5F801CA8910488B8598000000488D50088B45988902488B859"
+		. "8000000488D500C8B45948902C745CC04000000837D3001757"
+		. "A8B45F82B45948945D88B559489D001C001D08945D08B55948"
+		. "9D0C1E00201D001C083C0648945D4837DD8007907C745D8000"
+		. "000008B45682B45D83B45D07D3B8B45682B45D88945D0EB308"
+		. "B55E08B452801D03B45FC7F238B45CC8D50018955CC4898488"
+		. "D148500000000488B85980000004801D0C700FFFFFFFF8B45C"
+		. "C8D50018955CC4898488D148500000000488B8598000000480"
+		. "1D08B55EC83C2078910817DCCFD0300000F8FB5000000C745F"
+		. "000000000EB348B558C8B45F001D04898488D1485000000004"
+		. "88B85800000004801D08B108B45F401D04863D0488B4578480"
+		. "1D0C600308345F0018B45F03B45887CC48B45FC83C0010145D"
+		. "C8B45988945E08B45602B45DC3B45D40F8D8EFCFFFF8B45602"
+		. "B45DC8945D4E980FCFFFF90EB0490EB01908345EC078B45EC3"
+		. "B45380F8CB4FCFFFF8345F8018B45F83B45D00F8C82FCFFFF8"
+		. "345FC018B45FC3B45D40F8C66FCFFFF837DCC007508B800000"
+		. "000EB0690B8010000004883EC805DC3909090909090909090"
+		MCode(MyFunc, A_PtrSize=8 ? x64:x32)
+	}
+	ocrtxt:=[], info:=[], t1:=[], t0:=[], p:=0
+	loop, Parse, wenzi, |
+	{
+		v:=A_LoopField, txt:="", e1:=cha1, e0:=cha0
+		if RegExMatch(v,"<([^>]*)>",r)
+			v:=StrReplace(v,r), txt:=Trim(r1)
+		if RegExMatch(v,"\[([^\]]*)]",r)
+		{
+			v:=StrReplace(v,r), r2:=""
+			StringSplit, r, r1, `,
+			e1:=r1, e0:=r2
+		}
+		StringSplit, r, v, .
+		w:=r1, v:=base64tobit(r2), h:=StrLen(v)//w
+		if (r0<2 or h<1 or w>sw or h>sh or StrLen(v)!=w*h)
+			continue
+		len1:=len0:=0, j:=sw-w+1, i:=-j
+		ListLines, Off
+		loop, Parse, v
+		{
+			i:=Mod(A_Index,w)=1 ? i+j : i+1
+			if A_LoopField
+				t1[4*(p+len1++)]:=i
+			else
+				t0[4*(p+len0++)]:=i
+		}
+		ListLines, On
+		e1:=Round(len1*e1), e0:=Round(len0*e0)
+		info.Push(p,w,h,len1,len0,e1,e0)
+		ocrtxt.Push(txt), p+=StrLen(v)
+	}
+	IfEqual, p, 0, return, 0
+	mode:=InStr(c,"**") ? 2 : InStr(c,"*") ? 1 : 0
+	c:=StrReplace(c,"*"), interval:=5, limit:=1
+	if mode=0
+	{
+		c:=StrReplace(c,"0x") . "-0"
+		StringSplit, r, c, -
+		c:=Round("0x" r1), dc:=Round("0x" r2)
+	}
+	num:=info.MaxIndex()
+		, VarSetCapacity(gs, sw*sh)
+		, VarSetCapacity(ss, sw*sh, Asc("0"))
+		, VarSetCapacity(s1, p*4, 0)
+		, VarSetCapacity(s0, p*4, 0)
+		, VarSetCapacity(in, num*4)
+		, VarSetCapacity(out, 1024*4, 0)
+	ListLines, Off
+	loop, % num
+		NumPut(info[A_Index], in, (A_Index-1)*4, "int")
+	For k,v in t1
+		NumPut(v, s1, k, "int")
+	For k,v in t0
+		NumPut(v, s0, k, "int")
+	ListLines, On
+	if DllCall(&MyFunc, "int",mode
+		, "uint",c, "uint",dc
+		, "int",interval, "int",limit, "int",num
+		, "ptr",Scan0, "int",Stride
+		, "int",sx, "int",sy, "int",sw, "int",sh
+		, "ptr",&gs, "ptr",&ss
+		, "ptr",&s1, "ptr",&s0, "ptr",&in, "ptr",&out)
+	{
+		x:=NumGet(out,0,"int"), y:=NumGet(out,4,"int")
+		w:=NumGet(out,8,"int"), h:=NumGet(out,12,"int")
+		rx:=x+w//2, ry:=y+h//2, ocr:="", i:=12
+		while (k:=NumGet(out,i+=4,"int"))
+			v:=ocrtxt[k//7], ocr.=v="" ? "*" : v
+		return, 1
+	}
+	return, 0
+}
+MCode(ByRef code, hex)
+{
+	ListLines, Off
+	bch:=A_BatchLines
+	SetBatchLines, -1
+	VarSetCapacity(code, StrLen(hex)//2)
+	loop, % StrLen(hex)//2
+		NumPut("0x" . SubStr(hex,2*A_Index-1,2), code, A_Index-1, "char")
+	Ptr:=A_PtrSize ? "UPtr" : "UInt"
+	DllCall("VirtualProtect", Ptr,&code, Ptr
+		,VarSetCapacity(code), "uint",0x40, Ptr . "*",0)
+	SetBatchLines, %bch%
+	ListLines, On
+}
+base64tobit(s)
+{
+	ListLines, Off
+	Chars:="0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	. "abcdefghijklmnopqrstuvwxyz"
+	SetFormat, IntegerFast, d
+	StringCaseSense, On
+	loop, Parse, Chars
+	{
+		i:=A_Index-1, v:=(i>>5&1) . (i>>4&1)
+		. (i>>3&1) . (i>>2&1) . (i>>1&1) . (i&1)
+		s:=StrReplace(s,A_LoopField,v)
+	}
+	StringCaseSense, Off
+	s:=SubStr(s,1,InStr(s,"1",0,0)-1)
+	s:=RegExReplace(s,"[^01]+")
+	ListLines, On
+	return, s
+}
+bit2base64(s)
+{
+	ListLines, Off
+	s:=RegExReplace(s,"[^01]+")
+	s.=SubStr("100000",1,6-Mod(StrLen(s),6))
+	s:=RegExReplace(s,".{6}","|$0")
+	Chars:="0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	. "abcdefghijklmnopqrstuvwxyz"
+	SetFormat, IntegerFast, d
+	loop, Parse, Chars
+	{
+		i:=A_Index-1, v:="|" . (i>>5&1) . (i>>4&1)
+		. (i>>3&1) . (i>>2&1) . (i>>1&1) . (i&1)
+		s:=StrReplace(s,v,A_LoopField)
+	}
+	ListLines, On
+	return, s
+}
+
+; 下方为帮助说明内容
 helptext:
 加好友 =
 (
