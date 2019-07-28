@@ -11,13 +11,13 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.5.0.1
+File_Version=1.5.1.1
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
 Original_Filename=Everything has a spirit
 Product_Name=Everything has a spirit
-Product_Version=1.1.30.1
+Product_Version=1.1.30.3
 Set_AHK_Version=1
 Language_ID=30
 [ICONS]
@@ -141,7 +141,7 @@ Gui Tab, 1
 	Gui Font, s9, ; 定义后方字号
 	Gui Add, Button, x150 y35 w55 h75, 导入`nQQ号码`n列表
 	Gui Add, Button, x150 y115 w55 h75, 清空`nQQ号码`n列表
-	Gui Add, ListBox, x210 y35 w210 h155, 请先点击导入QQ号码列表按钮
+	Gui Add, ListBox, Choose1 x210 y35 w210 h155, 请先点击导入QQ号码列表按钮
 
 	Gui Add, Edit, VGreetings x150 y35 w270 h155, 请在这里输入问候语
 
@@ -206,12 +206,16 @@ Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
-CV = 1.5.0 ; 当前版本
+CV = 1.5.1 ; 当前版本
 Gosub, New ; 启动更新检查
 Return
 
 F7::Pause ; 全局暂停
-F3::Reload ; 强制重启程序
+Return
+F3::
+	Hotkey, F3, , OFF
+	Reload ; 强制重启程序
+Return
 
 GuiDropFiles:
 	If A_GuiControl = TXTQQ号码粗排版
@@ -278,9 +282,8 @@ Button点击开始排版:
 Button导入QQ号码列表:
 	Gui +OwnDialogs ; 下方窗口运行时禁止操作母窗口
 	FileSelectFile, file, , , 选择QQ号文本文件, *.txt ; 文件选择窗口
-
 	GuiControl, -Redraw, ListBox1 ; 禁用控件重绘
-	ControlGet, QList, List,, ListBox1, ‎Everything has a spirit ahk_class AutoHotkeyGUI
+	GuiControlGet, QList, , ListBox1 ; 获取选中项内容
 	If QList = 请先点击导入QQ号码列表按钮
 	{
 		GuiControl, , ListBox1, | ; 清空列表
@@ -290,9 +293,11 @@ Button导入QQ号码列表:
 		GuiControl, , ListBox1, %A_LoopReadLine% ; 向列表写入新内容
 	}
 	GuiControl, +Redraw, ListBox1 ; 启用控件重绘
+	GuiControl, Choose, ListBox1, 1 ; 选中列表第一项
 	Return
 Button清空QQ号码列表:
 	GuiControl, , ListBox1, |请先点击导入QQ号码列表按钮 ; 置换回初始列表
+	GuiControl, Choose, ListBox1, 1 ; 选中列表第一项
 	Return
 Button执行:
 	Process, Exist, QQ2010自动接收器.exe ; 检测进程
@@ -470,7 +475,7 @@ Button执行:
 							MouseMove, X, Y ; 鼠标移动到偏移后坐标
 							Click, WheelDown, 5 ; 向下滚动5次
 							滚页 = 0
-							Sleep, 500
+							Sleep, 1000
 							CoordMode, Mouse ; 相对屏幕执行鼠标动作
 							Click, %X%, %Y% ; 点击偏移后坐标
 							Continue
