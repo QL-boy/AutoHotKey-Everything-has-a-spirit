@@ -11,7 +11,7 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.5.1.1
+File_Version=1.6.0.1
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
@@ -61,8 +61,20 @@ Icon_5=0
 	(%优化修复%) 优化修复帮助说明
 	(%辅助增强%) 辅助增强帮助说明
 	(%TopAndBottom%) 窗口置顶或取消运行状态
-	(%滚页%) 失效好友添加页面滚动参数
-
+	(%滚页%) 营销 QQ 失效添加：失效好友添加页面滚动参数
+	(%加为好友%) 营销 QQ 失效添加：加为好友 OCR 数据
+	(%已失效%) 营销 QQ 失效添加：已失效 OCR 数据
+	(%左翻页%) 营销 QQ 失效添加：左翻页 OCR 数据
+	(%取消%) 营销 QQ 失效添加：取消 OCR 数据
+	(%找到好友%) 普通和企业 QQ 加号友：找到好友 OCR 数据
+	(%没有找到%) 普通和企业 QQ 加号友：没有找到 OCR 数据
+	(%验证问题%) 普通和企业 QQ 加号友：验证问题 OCR 数据
+	(%验证信息%) 普通和企业 QQ 加号友：验证信息 OCR 数据
+	(%备注姓名%) 普通和企业 QQ 加号友：备注姓名 OCR 数据
+	(%添加完成%) 普通和企业 QQ 加号友：添加完成 OCR 数据
+	(%拒绝添加%) 普通和企业 QQ 加号友：拒绝添加 OCR 数据
+	(%重复添加%) 普通和企业 QQ 加号友：重复添加 OCR 数据
+	(%qqline%) 加号友 QQ 号码列表行
 标签声明：
 	(GuiDropFiles:) 拖动文件执行排版
 	(Button点击开始排版:) 点击开始排版
@@ -206,7 +218,7 @@ Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
-CV = 1.5.1 ; 当前版本
+CV = 1.6.0 ; 当前版本
 Gosub, New ; 启动更新检查
 Return
 
@@ -292,6 +304,8 @@ Button导入QQ号码列表:
 	{
 		GuiControl, , ListBox1, %A_LoopReadLine% ; 向列表写入新内容
 	}
+	tt = end
+	GuiControl, , ListBox1, %tt%
 	GuiControl, +Redraw, ListBox1 ; 启用控件重绘
 	GuiControl, Choose, ListBox1, 1 ; 选中列表第一项
 	Return
@@ -491,28 +505,19 @@ Button执行:
 		Else If Jway = 2
 		{	
 			F4:
-
-			IfWinNotExist, ahk_class Notepad ahk_exe NOTEPAD.EXE
+			GuiControlGet, QList, , ListBox1 ; 获取选中项内容
+			If QList = 请先点击导入QQ号码列表按钮
 			{
-				IfWinNotExist, 查找 ahk_class TXGuiFoundation
-				{
-					MsgBox, 262165, 缺少必要条件, 没有检测到QQ查找界面和需要添加的QQ号码文档，请确保QQ好友查找窗口和QQ号码txt文档窗口处于打开状态, 6
-					IfMsgBox, Retry
-					{
-						Goto, F4
-					}
-					Return
-				}
-				MsgBox, 262165, 缺少必要条件, 没有检测到需要添加的QQ号码文档，请确保QQ号码txt文档窗口处于打开状态, 5
+				MsgBox, 262165, 缺少必要条件, 没有导入 QQ 号码无法进行此操作, 4
 				IfMsgBox, Retry
 				{
 					Goto, F4
 				}
 				Return
 			}
-			Else IfWinNotExist, 查找 ahk_class TXGuiFoundation
+			IfWinNotExist, 查找 ahk_class TXGuiFoundation
 			{
-				MsgBox, 262165, 缺少必要条件, 没有检测到QQ查找界面，请确保QQ好友查找窗口处于打开状态, 5
+				MsgBox, 262165, 缺少必要条件, 没有检测到 QQ 查找界面，请确保QQ好友查找窗口处于打开状态, 5
 				IfMsgBox, Retry
 				{
 					Goto, F4
@@ -525,72 +530,106 @@ Button执行:
 			SetTimer, RemoveToolTip, 3500
 
 			WinHide, ‎Everything has a spirit ahk_class AutoHotkeyGUI
+			
 			WinMinimizeAll ; 最小化所有窗口
+			Sleep, 150
 			WinRestore, 查找 ahk_class TXGuiFoundation  ; 恢复查找窗口
-			WinRestore, ahk_class Notepad ahk_exe NOTEPAD.EXE ; 恢复QQ号码文档窗口
-			WinMove, ahk_class Notepad ahk_exe NOTEPAD.EXE,, 0, 120, 143, 600  ; 调整QQ号码txt文档窗口位置和尺寸
-
+			
+			找到好友:="|<>52.Tzzzzzzzv00000000s00000001U00100E06000CzXU0M0M1g7vy1U2E6k4U46090Uwk0EM3b32Zny1UE24ix086108K0QQUM3b3LiZq1U2E6Sumk60909fHW0M0M1/jQC1U009sf746000QyPrkM0001kM61k0000000Bzzzzzzzzc"
+			没有找到:="|<>66.3s0000000008Y0Fw30AwznEG0RyzzAqyv2F09aK1yHB/VV0n77y/zNeWF0S3A69mzfWF0/yQ6CK6fWF096ryyQTfWF0NgA6AMzeGG0MwDyBt6/9a0NwA6/hDn7s0rjASwDzj000K34QM20CU"
+			验证问题:="|<>51.wMvzTzTz7rXTtzuN8JyAMk3SO2wz/6TOKvLzvSLvSfTmHPunKRPLPPMqPwf7jnv6zOxszyRMrvSSMonDu0TiPTz7zkTzz3U0021oDsU"
+			验证信息:="|<>51.wMHzAE105bXTtztzkIq8M81862gw/3TtzkLztMM086PmH/zTt0n5GNM80Dy1hnv3TuAkwiRMP2JXMkX91MKVvTz7z/yrw10001MEC0U"
+			备注姓名:="|<>51.60Ek88201zX3150zkSA3zyzA62T623zXlU7wMEH83kTls72l0Q0Dw3yJzTy14V21V3UEDwMEA84294W23F0UHDwLzlz7y4"
+			添加完成:="|<>69.00rkYV4E1E17z43AWAG09T80NUlzsjtzwbw3+A3U08A84NzvrM83V1V8VDz5UXz7zjd4NU1bsQEV1ZEWA0iA6a4Q8i7FU41UXUaN5bqA1jA8QB1/AUVzsDzQTTz6QNw"
+			拒绝添加:="|<>60.808U88E0809yMw8Q9y8Sz0L4xz0kTP9yzy5+rz9H92POB8Ng9HD29OTy369Ht2RyxG6H9H9yF2DINS9H90119AGONH90T1+QGRFTNz1zDnFkrHU"
+			重复添加:="|<>52.Dy40E080060zxbsVsDzrzUADqk1Us6rz9H0zsztakZA3zX1UlWIk9WDy6H9H0zsTthsZA2MXX4aaImDwlsGRFTLzwxx73RBs"
+			GuiControl, +AltSubmit, ListBox1
+			GuiControlGet, qqline, , ListBox1 ; 获取选中项位置
+			GuiControl, -AltSubmit, ListBox1
 			Loop, %Jfrequency% ; 循环%Jfrequency%变量指定的循环次数
 			{
-				WinActivate, ahk_class Notepad ahk_exe NOTEPAD.EXE ; 激活txt文本窗口
-				Sleep,10
-				SetControlDelay -1  ; 这样可以避免在点击时按住鼠标, 减少对用户使用鼠标的干扰.
-				ControlClick, Edit1, ahk_class Notepad ahk_exe NOTEPAD.EXE,, Left, 3,  x29 y9 NA ; 光标移动到编辑区首行并单击
-				Send, ^{Right} ; 光标移动到当前行右侧
-				Sleep, 10
-				Send, ^+{Left} ; 当前行从光标位置向左选中一段连续字符
-				Sleep, 10
-				Send, ^x ; 剪切选中字符
-				Sleep, 10
-				Send, {Down} ; 光标向下移动一行
-				Sleep, 10
-				Send, {Backspace} ; 向左删除一个字符位
-				Sleep, 10
+				DetectHiddenWindows, On ; 开启隐藏窗口检测
+				GuiControlGet, QList, , ListBox1 ; 获取选中项内容
+				If QList = end
+				{
+					Break
+				}
+				; ------------------此处待改-----------------
+				;Control, Delete, 1, ListBox1, 测试窗口 ahk_class AutoHotkeyGUI
+				;-------------------------------------------
+				qqline := % qqline+1
+				GuiControl, Choose, ListBox1, %qqline% ; 选中列表指定项
+				DetectHiddenWindows, Off ; 关闭隐藏窗口检测
 				WinActivate, 查找 ahk_class TXGuiFoundation ; 激活QQ查找窗口
 				Sleep, 10
 				SetControlDelay -1  ; 这样可以避免在点击时按住鼠标, 减少对用户使用鼠标的干扰.
 				ControlClick, , 查找 ahk_class TXGuiFoundation,, Left, 1,  x68 y101 NA ; 光标定位到输入条
 				Send, ^a ; 全选输入条内所有内容
-				Send, ^v ; 粘贴内容到输入条
-				Send, {Enter}
-				Loop ; 循环直到开始搜索
-				{
-					CoordMode, Pixel, Window
-					PixelGetColor, color, 455, 390, RGB
-				}
-				Until color != 0xFFFFFF
+				SendInput, {Text}%QList% ; 发送内容到输入条
+				Send, {Enter} ; 开始搜索
 				Loop ; 循环直到搜索完成
 				{
-					CoordMode, Pixel, Window
-					PixelGetColor, color, 455, 390, RGB
-				}
-				Until color = 0xFFFFFF
-				Sleep, 50
-				CoordMode, Pixel, Window ; 设定坐标方式相对于当前活动窗口
-				PixelGetColor, color, 104, 304, RGB ; 获取指定坐标点色值
-				If color = 0x8FC0E7 ; 如果搜索到相关QQ执行下方
-				{
-					Loop, 8 ; 焦点转移到+好友按钮
+					Sleep, 100
+					If 识别结果(271,387,150000,150000,找到好友,"**19",X,Y,OCR,0,0)
 					{
-						Send, {Tab}
+						CoordMode, Mouse ; 相对屏幕执行鼠标动作
+						Click, %X%, %Y%
+						MouseMove, x, y+20
+						Break
 					}
-					Sleep, 10
-					Send, {Enter}
-					SetTitleMatchMode, 2 ; 下方匹配为包含匹配
-					WinWait, 添加好友 ahk_class TXGuiFoundation
-					Sleep, 200
-					Send, {Enter}
-					Sleep, 200
-					Send, {Enter}
-					loop ; 出现完成时点击
+					Else If 识别结果(421,483,150000,150000,没有找到,"**30",X,Y,OCR,0,0)
 					{
-						CoordMode, Pixel, Window ; 设定坐标方式相对于当前活动窗口
-						PixelGetColor, color, 319, 346, Alt RGB ; 获取指定坐标点色值
-						If color = 0xE3E3E2
+						Continue, 2
+					}
+				}
+				SetTitleMatchMode, 2
+				tt = 0
+				Loop ; 添加操作
+				{
+					Sleep, 100
+					IfWinExist, 添加好友 ahk_class TXGuiFoundation
+					{
+						If 识别结果(521,343,150000,150000,重复添加,"*137",X,Y,OCR,0,0)
 						{
-							Send, {Enter}
+							ControlClick, x342 y345, 添加好友 ahk_class TXGuiFoundation
+							Continue, 2
+						}
+						Else If 识别结果(572,297,150000,150000,备注姓名,"*140",X,Y,OCR,0,0)
+						{
+							ControlClick, x344 y346, 添加好友 ahk_class TXGuiFoundation
 							Break
 						}
+						Else If 识别结果(581,309,150000,150000,验证信息,"**55",X,Y,OCR,0,0)
+						{
+							ControlClick, x344 y346, 添加好友 ahk_class TXGuiFoundation
+						}
+						Else If 识别结果(772,357,150000,150000,验证问题,"**30",X,Y,OCR,0,0)
+						{
+							ControlClick, x421 y345, 添加好友 ahk_class TXGuiFoundation
+							Continue, 2
+						}
+						Else If 识别结果(620,306,150000,150000,拒绝添加,"*130",X,Y,OCR,0,0)
+						{
+							ControlClick, x420 y345, 添加好友 ahk_class TXGuiFoundation
+							Continue, 2
+						}
+					}
+					Else IfWinNotExist, 添加好友 ahk_class TXGuiFoundation ; 虽然不太可能，但还是以防万一吧
+					{
+						tt := % tt+1
+						If tt > 8
+						{
+							Continue, 2
+						}
+					}
+				}
+				Loop
+				{
+					Sleep, 50
+					If 识别结果(499,241,150000,150000,添加完成,"*130",X,Y,OCR,0,0)
+					{
+						ControlClick, x420 y345, 添加好友 ahk_class TXGuiFoundation
+						Break
 					}
 				}
 			}
@@ -775,7 +814,8 @@ Button执行:
 			SetTimer, RemoveToolTip, 3500
 
 			WinHide, ‎Everything has a spirit ahk_class AutoHotkeyGUI
-			WinMinimizeAll
+			WinMinimizeAll ; 最小化所有窗口
+			Sleep, 150
 			SetTitleMatchMode, 2 ; 窗口标题的某个位置必须包含 QQ 才能匹配
 			WinRestore, QQ ahk_class TXGuiFoundation ; 还原QQ主窗口
 			MsgBox, , 提示, 请单击选中待发送列表中的开始第一个客户后，点击确认继续
@@ -1660,13 +1700,19 @@ bit2base64(s)
 helptext:
 加好友 =
 (
-加好友:
+1. 注意关闭自动接收器等其他类型的自动化工具，否则容易产生冲突
+2. 中途若需要进行其他操作需要按下F7即可暂停
+3. F3键可以强制结束一切线程重新加载程序（不要长按F3，单击一次即可）
+4. 关机选项工作状态不要轻易勾选（真的会关机的）
+
+普通和起印QQ加好友:
 1. 需要确保查找窗口存在并且没有遮挡
-2. 需要确保已整理规范的txt文档处于打开状态
-3. 中途若需要进行其他操作需要按下F7即可暂停
-4. F3键可以强制结束一切线程重新加载程序（不要长按F3，单击一次即可）
-5. 注意关闭自动接收器等其他类型的自动化工具，否则容易产生冲突
-6. 关机选项工作状态不要轻易勾选（真的会关机的）
+2. 开始前一定要先在列表中导入QQ号码
+3. 列表中以你选中的号码作第一个开始添加
+
+营销QQ失效好友添加:
+1. 开始前需要确保营销QQ窗口存在并且无遮挡
+2. 建议打开客户列表中的最后一页，并选择最后一排失效客户作为开始
 
 QQ号码整理:
 1. 只支持txt文本格式
@@ -1685,7 +1731,6 @@ QQ号码整理:
 营销QQ:
 1. 开始前需要确保营销QQ窗口存在并且无遮挡
 2. 待发送列表一定要从后向前数最后一页未失效的开始
-3. 窗口如果被强行置顶未重置的情况可以通过辅助增强功能恢复。
 
 普通和企业QQ:
 1. 开始前需要确保企业或普通QQ存在且只存在1个主窗口
