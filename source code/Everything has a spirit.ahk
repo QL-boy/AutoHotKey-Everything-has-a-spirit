@@ -11,7 +11,7 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.6.0.1
+File_Version=1.6.1.1
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
@@ -112,6 +112,8 @@ SetBatchLines -1 ; 脚本全速运行
 ListLines Off ; 在历史中略去后续执行的行
 SetWorkingDir %A_ScriptDir% ; 脚本当前工作目录
 
+ToolTip, 程序正在加载中`,请稍等一会 ; 提示气泡
+/*
 URL := "http://xui.ptlogin2.qq.com/cgi-bin/xlogin?appid=501038301&proxy_url=http%3A%2F%2Fid.qq.com%2Flogin%2Fproxy.html&s_url=http%3A%2F%2Fim.qq.com%2F"
 If InternetCheckConnection(URL)
 { ; 跳过预设 QQ 
@@ -121,7 +123,7 @@ If InternetCheckConnection(URL)
 		ExitApp
 	}
 }
-
+*/
 Gosub, helptext ; 读取说明帮助
 
 Menu Tray, NoStandard ; 取除托盘默认菜单
@@ -198,7 +200,7 @@ Gui Tab, 4
 	Gui Add, Button, x290 y30 w130 h40, 恢复快捷方式小箭头
 	Gui Add, Button, x10 y75 w130 h40, 系统详细信息
 	Gui Add, Button, x150 y75 w130 h40, 敬请期待
-{ ; 禁用隐藏初始控件
+{ ; 禁用并隐藏初始控件
 	GuiControl, Disable, Button10
 	GuiControl, Disable, Button11
 	GuiControl, Disable, ListBox1
@@ -208,18 +210,22 @@ Gui Tab, 4
 	GuiControl, Hide, ListBox1
 	GuiControl, Hide, Edit2
 }
+/*
 tt := 0
 Loop, 10 ; 程序开启延展
 {
 	tt := % tt + 43
 	Gui Show, w%tt% h300 Center, ‎Everything has a spirit ; 程序开启
 }
+*/
 Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
-CV = 1.6.0 ; 当前版本
+ToolTip, 程序已经加载完成`,正在检查更新 ; 提示气泡
+CV = 1.6.1 ; 当前版本
 Gosub, New ; 启动更新检查
+ToolTip
 Return
 
 F7::Pause ; 全局暂停
@@ -1276,6 +1282,7 @@ GuiClose:
 			Return
 		}
 	}
+	/*
 	WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 ‎Everything has a spirit 窗口的大小
 	If (sizeH + sizeW > dimensionH + dimensionW)
 	{
@@ -1285,18 +1292,22 @@ GuiClose:
 	{
 		sizeH := % sizeH-(sizeH-300)
 	}
+	
 	tt := 430
 	Loop, 43
 	{
 		tt := % tt-10
 		Gui Show, w%tt% h%sizeH%, ‎Everything has a spirit ; 程序关闭
 	}
+	*/
 	ExitApp
 
 InternetCheckConnection(Url="",FIFC=1) ; 联网检测函数
 {
 	Return DllCall("Wininet.dll\InternetCheckConnectionW", Str,Url, Int,FIFC, Int,0)
 }
+
+/*
 GetLoggedinQQ() ; 已登录 QQ 检测函数
 {
 	static wb
@@ -1319,6 +1330,8 @@ GetLoggedinQQ() ; 已登录 QQ 检测函数
 	Gui, Destroy
 	Return qq
 }
+*/
+
 WriteFile(file,data) ; 写入扩展数据
 {
     Handle :=  DllCall("CreateFile","str",file,"Uint",0x40000000
