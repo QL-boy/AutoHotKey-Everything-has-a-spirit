@@ -11,7 +11,7 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.6.2.1
+File_Version=1.6.2.2
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
@@ -222,6 +222,8 @@ Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
+
+CV = 1.6.2 ; 当前版本
 
 #Persistent
 ToolTip, 程序已经加载完成`,可以开始了 ; 提示气泡
@@ -1329,7 +1331,6 @@ GuiClose:
 		Gui Show, w%tt% h%sizeH%, ‎Everything has a spirit ; 程序关闭
 	}
 	*/
-	CV = 1.6.2 ; 当前版本
 	Gosub, New ; 启动更新检查
 	ExitApp
 
