@@ -11,7 +11,7 @@ Execution_Level=4
 Set_Version_Info=1
 Company_Name=千灵独立开发
 File_Description=千灵辅助工具箱
-File_Version=1.6.1.1
+File_Version=1.6.2.1
 Inc_File_Version=0
 Internal_Name=千灵辅助
 Legal_Copyright=千灵
@@ -21,7 +21,7 @@ Product_Version=1.1.30.3
 Set_AHK_Version=1
 Language_ID=30
 [ICONS]
-Icon_1=F:\程序设计\综合资源\图标\阿里开放图标（部分）\千灵辅助工具箱.ico
+Icon_1=F:\93941\Documents\公共\AHK\程序设计\综合资源\图标\阿里开放图标（部分）\千灵辅助工具箱.ico
 Icon_2=0
 Icon_3=0
 Icon_4=0
@@ -222,10 +222,10 @@ Gui Show, w430 h300 Center, ‎Everything has a spirit
 WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 Everything has a spirit 窗口的大小
 dimensionH := sizeH
 dimensionW := sizeW
-ToolTip, 程序已经加载完成`,正在检查更新 ; 提示气泡
-CV = 1.6.1 ; 当前版本
-Gosub, New ; 启动更新检查
-ToolTip
+
+#Persistent
+ToolTip, 程序已经加载完成`,可以开始了 ; 提示气泡
+SetTimer, RemoveToolTip, 2000
 Return
 
 F7::Pause ; 全局暂停
@@ -902,7 +902,10 @@ Button执行:
 	}
 	Return
 Button冗沉垃圾清理:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	@echo off
@@ -924,11 +927,14 @@ Button冗沉垃圾清理:
 	del /f /s /q "%userprofile%\recent\*.*"
 	echo 清理系统垃圾完成！
 	echo. & pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button网络dns缓存清理:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	@echo off
@@ -938,21 +944,27 @@ Button网络dns缓存清理:
 	echo ~~~~~~~~~~~~~~~~
 		echo 目测已经清理干净dns缓存
 		pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button解除拖动打开限制: ; 由于 ahk不能在本机写入注册表只能取巧了
-	FileDelete, C:\tmp\tt.reg
+	If FileExist("C:\temp\tt.reg") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.reg
+	}
 	FileAppend,
 	(
 	Windows Registry Editor Version 5.00
 	[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
 	"EnableLUA"=dword:00000000
-	), C:\tmp\tt.reg
-	Run C:\tmp\tt.reg
+	), C:\temp\tt.reg
+	Run C:\temp\tt.reg
 	Return
 Button系统检测及修复:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	@echo off
@@ -966,8 +978,8 @@ Button系统检测及修复:
 	rem shutdown
 	@echo.
 	@pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button窗口置顶或取消:
 	Menu Tray, Add, 窗口置顶或取消说明, hint
@@ -995,7 +1007,10 @@ Button窗口置顶或取消:
 	Menu Tray, DeleteAll
 	Return
 Button去除快捷方式箭头:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /d "%systemroot%\system32\imageres.dll,197" /t reg_sz /f
@@ -1004,11 +1019,14 @@ Button去除快捷方式箭头:
 	del "%userprofile%\AppData\Local\iconcache.db" /f /q
 	start explorer
 	pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button恢复快捷方式小箭头:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons" /v 29 /f
@@ -1017,17 +1035,20 @@ Button恢复快捷方式小箭头:
 	del "%userprofile%\AppData\Local\iconcache.db" /f /q
 	start explorer
 	pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button系统详细信息:
-	FileDelete, C:\tmp\tt.cmd
+	If FileExist("C:\temp\tt.cmd") ;如果脚本存在则删除现有
+	{
+		FileDelete, C:\temp\tt.cmd
+	}
 	FileAppend,
 	(
 	systeminfo
 		pause
-	), C:\tmp\tt.cmd
-	Run *RunAs C:\tmp\tt.cmd
+	), C:\temp\tt.cmd
+	Run *RunAs C:\temp\tt.cmd
 	Return
 Button更新记录:
 	run, https://github.com/QL-boy/AutoHotKey-Everything-has-a-spirit/blob/master/Change`%20log.md
@@ -1281,7 +1302,15 @@ GuiClose:
 		{
 			Return
 		}
+		Else IfMsgBox, OK
+		{
+			Menu, Tray, Tip, ‎Everything has a spirit
+			Hotkey, #BackSpace, , OFF
+			Hotkey, #End, , OFF
+			Menu Tray, DeleteAll
+		}
 	}
+	Gui, Destroy
 	/*
 	WinGetPos, , , sizeW, sizeH, ‎Everything has a spirit ahk_class AutoHotkeyGUI ; 获取 ‎Everything has a spirit 窗口的大小
 	If (sizeH + sizeW > dimensionH + dimensionW)
@@ -1300,6 +1329,8 @@ GuiClose:
 		Gui Show, w%tt% h%sizeH%, ‎Everything has a spirit ; 程序关闭
 	}
 	*/
+	CV = 1.6.2 ; 当前版本
+	Gosub, New ; 启动更新检查
 	ExitApp
 
 InternetCheckConnection(Url="",FIFC=1) ; 联网检测函数
